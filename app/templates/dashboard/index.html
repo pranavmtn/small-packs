@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+  <div>
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-sub mb-0">Your household packs at a glance.</p>
+  </div>
+  <a href="{{ url_for('packs.add') }}" class="btn btn-accent btn-lg">+ Add Pack</a>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-4">
+    <div class="stat-tile">
+      <div class="stat-label">Total Packs</div>
+      <div class="stat-value">{{ stats.total_packs }}</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4">
+    <div class="stat-tile">
+      <div class="stat-label">Active Packs</div>
+      <div class="stat-value">{{ stats.active_packs }}</div>
+    </div>
+  </div>
+  <div class="col-12 col-md-4">
+    <div class="stat-tile">
+      <div class="stat-label">Recently Added</div>
+      <div class="stat-value">{{ stats.recent_packs|length }}</div>
+      <div class="stat-hint">Showing latest</div>
+    </div>
+  </div>
+</div>
+
+<form method="get" action="{{ url_for('dashboard.index') }}" class="search-bar mb-4">
+  <label for="q" class="form-label visually-hidden">Quick Search</label>
+  <div class="input-group input-group-lg">
+    <input type="search" class="form-control" id="q" name="q" value="{{ search }}" placeholder="Quick search packs…">
+    <button class="btn btn-ink" type="submit">Search</button>
+  </div>
+</form>
+
+{% if search %}
+<section class="mb-5">
+  <h2 class="section-title">Search results for “{{ search }}”</h2>
+  {% if search_results %}
+    <div class="row g-3">
+      {% for pack in search_results %}
+        {% include "packs/_card.html" %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-muted">No packs matched your search.</p>
+  {% endif %}
+</section>
+{% endif %}
+
+<section>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="section-title mb-0">Recent Packs</h2>
+    <a href="{{ url_for('packs.list_packs') }}" class="link-more">View all</a>
+  </div>
+
+  {% if stats.recent_packs %}
+    <div class="row g-3">
+      {% for pack in stats.recent_packs %}
+        {% include "packs/_card.html" %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <p>No packs yet.</p>
+      <a href="{{ url_for('packs.add') }}" class="btn btn-accent">Add your first pack</a>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

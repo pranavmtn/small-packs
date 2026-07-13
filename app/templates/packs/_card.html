@@ -1,0 +1,35 @@
+<div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+  <article class="pack-card h-100">
+    <a href="{{ url_for('packs.detail', pack_id=pack.id) }}" class="pack-card-media">
+      {% if pack.photo_url %}
+        <img src="{{ pack.photo_url }}" alt="{{ pack.name }}" loading="lazy">
+      {% else %}
+        <div class="pack-card-placeholder">No photo</div>
+      {% endif %}
+    </a>
+    <div class="pack-card-body">
+      <h3 class="pack-card-title">
+        <a href="{{ url_for('packs.detail', pack_id=pack.id) }}">{{ pack.name }}</a>
+      </h3>
+      <p class="pack-card-meta">{{ pack.location_display() or "No location" }}</p>
+      <div class="pack-card-stats">
+        <span>Age {{ pack.age_display() }}</span>
+        {% if pack.condition_percent is not none %}
+          <span>Cond {{ pack.condition_percent }}%</span>
+        {% endif %}
+      </div>
+      <div class="pack-card-actions">
+        <a class="btn btn-sm btn-outline-ink" href="{{ url_for('packs.detail', pack_id=pack.id) }}">View</a>
+        <a class="btn btn-sm btn-outline-ink" href="{{ url_for('packs.edit', pack_id=pack.id) }}">Edit</a>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-danger"
+          data-bs-toggle="modal"
+          data-bs-target="#deleteModal"
+          data-delete-url="{{ url_for('packs.delete', pack_id=pack.id) }}"
+          data-delete-name="{{ pack.name }}"
+        >Delete</button>
+      </div>
+    </div>
+  </article>
+</div>

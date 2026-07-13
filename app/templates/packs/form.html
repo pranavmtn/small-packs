@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+{% block title %}{% if mode == 'edit' %}Edit{% else %}Add{% endif %} Pack · {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="page-header mb-3">
+  <h1 class="page-title">{% if mode == 'edit' %}Edit Pack{% else %}Add Pack{% endif %}</h1>
+  <p class="page-sub mb-0">
+    Fast entry · <kbd>Enter</kbd> save · <kbd>Ctrl</kbd>+<kbd>Enter</kbd> save &amp; next
+  </p>
+</div>
+
+<form
+  method="post"
+  enctype="multipart/form-data"
+  id="packForm"
+  class="pack-form"
+  data-mode="{{ mode }}"
+  data-clear-prefs="{{ '1' if clear_prefs else '0' }}"
+  novalidate
+>
+  <div class="row g-4">
+    <div class="col-12 col-lg-5">
+      <div class="photo-panel">
+        <label class="form-label fw-semibold">Photo</label>
+        <div class="photo-preview" id="photoPreview">
+          {% if pack and pack.photo_url %}
+            <img src="{{ pack.photo_url }}" alt="Current photo" id="photoPreviewImg">
+          {% else %}
+            <div class="photo-empty" id="photoEmpty">Drop or choose a photo</div>
+            <img src="" alt="" id="photoPreviewImg" class="d-none">
+          {% endif %}
+        </div>
+        <div class="d-grid gap-2 mt-3">
+          <label class="btn btn-ink btn-lg photo-upload-btn" for="photo">
+            Upload Photo
+          </label>
+          <label class="btn btn-outline-ink btn-lg" for="photoCamera">
+            Take Photo
+          </label>
+        </div>
+        <input type="file" class="d-none" id="photo" name="photo" accept="image/*">
+        <input type="file" class="d-none" id="photoCamera" accept="image/*" capture="environment">
+        <p class="form-text mt-2 mb-0">Images upload to Bunny.net. Only the URL is stored.</p>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-7">
+      <div class="mb-3">
+        <label for="name" class="form-label">Item Name <span class="req">*</span></label>
+        <input
+          type="text"
+          class="form-control form-control-lg"
+          id="name"
+          name="name"
+          required
+          autofocus
+          value="{{ pack.name if pack else '' }}"
+          placeholder="What is this item?"
+          autocomplete="off"
+        >
+      </div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-6">
+          <label for="age_years" class="form-label">Age — Years</label>
+          <input
+            type="number"
+            class="form-control form-control-lg"
+            id="age_years"
+            name="age_years"
+            min="0"
+            max="200"
+            value="{{ pack.age_years if pack and pack.age_years is not none else '' }}"
+            inputmode="numeric"
+          >
+        </div>
+        <div class="col-6">
+          <label for="age_months" class="form-label">Age — Months</label>
+          <input
+            type="number"
+            class="form-control form-control-lg"
+            id="age_months"
+            name="age_months"
+            min="0"
+            max="11"
+            value="{{ pack.age_months if pack and pack.age_months is not none else '' }}"
+            inputmode="numeric"
+          >
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="location" class="form-label">Location <span class="req">*</span></label>
+        <input
+          type="text"
+          class="form-control form-control-lg"
+          id="location"
+          name="location"
+          required
+          value="{{ location_text }}"
+          placeholder="e.g. Roof Top Storage first box first level"
+          list="locationSuggestions"
+          autocomplete="off"
+        >
+        <datalist id="locationSuggestions"></datalist>
+        <div class="location-preview mt-2" id="locationPreview" aria-live="polite"></div>
+        <p class="form-text mb-0">Type naturally — saved as a structured path automatically.</p>
+      </div>
+
+      {% if mode == 'edit' %}
+      <div class="mb-3">
+        <label for="status" class="form-label">Status</label>
+        <select class="form-select" id="status" name="status">
+          {% for s in statuses %}
+            <option value="{{ s }}" {% if pack and pack.status == s %}selected{% endif %}>{{ s|capitalize }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      {% else %}
+        <input type="hidden" name="status" value="active">
+      {% endif %}
+
+      <details class="more-details mb-4" id="moreDetails">
+        <summary>More Details</summary>
+        <div class="more-details-body">
+          <div class="mb-3">
+            <label for="category" class="form-label">Category</label>
+            <input
+              type="text"
+              class="form-control"
+              id="category"
+              name="category"
+              value="{{ pack.category if pack and pack.category else '' }}"
+              placeholder="Optional — AI will fill later"
+            >
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <label for="condition_percent" class="form-label">Condition %</label>
+              <input
+                type="number"
+                class="form-control"
+                id="condition_percent"
+                name="condition_percent"
+                min="0"
+                max="100"
+                value="{{ pack.condition_percent if pack and pack.condition_percent is not none else '' }}"
+              >
+            </div>
+            <div class="col-6">
+              <label for="importance_percent" class="form-label">Importance %</label>
+              <input
+                type="number"
+                class="form-control"
+                id="importance_percent"
+                name="importance_percent"
+                min="0"
+                max="100"
+                value="{{ pack.importance_percent if pack and pack.importance_percent is not none else '' }}"
+              >
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="suggested_price" class="form-label">Suggested Price</label>
+            <input
+              type="number"
+              class="form-control"
+              id="suggested_price"
+              name="suggested_price"
+              min="0"
+              step="0.01"
+              value="{{ pack.suggested_price if pack and pack.suggested_price is not none else '' }}"
+            >
+          </div>
+          <div class="mb-0">
+            <label for="notes" class="form-label">Notes</label>
+            <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Optional notes">{{ pack.notes if pack and pack.notes else '' }}</textarea>
+          </div>
+        </div>
+      </details>
+
+      <div class="action-bar sticky-actions">
+        {% if mode == 'add' %}
+          <button type="submit" name="action" value="save" class="btn btn-accent btn-lg" id="btnSave">Save Pack</button>
+          <button type="submit" name="action" value="save_next" class="btn btn-ink btn-lg" id="btnSaveNext">Save &amp; Add Next</button>
+          <button type="submit" name="action" value="save_clear" class="btn btn-outline-ink btn-lg" id="btnSaveClear">Save &amp; Clear</button>
+        {% else %}
+          <button type="submit" name="action" value="save" class="btn btn-accent btn-lg" id="btnSave">Save Changes</button>
+          <a href="{{ url_for('packs.detail', pack_id=pack.id) }}" class="btn btn-outline-ink btn-lg">Cancel</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/pack-form.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Packs · {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+  <div>
+    <h1 class="page-title">All Packs</h1>
+    <p class="page-sub mb-0">{{ packs|length }} shown</p>
+  </div>
+  <a href="{{ url_for('packs.add') }}" class="btn btn-accent">+ Add Pack</a>
+</div>
+
+<form method="get" class="row g-2 align-items-end filter-bar mb-4">
+  <div class="col-12 col-md-6">
+    <label for="q" class="form-label">Search</label>
+    <input type="search" class="form-control" id="q" name="q" value="{{ search }}" placeholder="Name, notes, category…">
+  </div>
+  <div class="col-8 col-md-4">
+    <label for="status" class="form-label">Status</label>
+    <select class="form-select" id="status" name="status">
+      <option value="all" {% if status == 'all' %}selected{% endif %}>All</option>
+      {% for s in statuses %}
+        <option value="{{ s }}" {% if status == s %}selected{% endif %}>{{ s|capitalize }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-4 col-md-2">
+    <button type="submit" class="btn btn-ink w-100">Filter</button>
+  </div>
+</form>
+
+{% if packs %}
+  <div class="row g-3">
+    {% for pack in packs %}
+      {% include "packs/_card.html" %}
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <p>No packs match your filters.</p>
+    <a href="{{ url_for('packs.add') }}" class="btn btn-accent">Add a pack</a>
+  </div>
+{% endif %}
+
+{% include "packs/_delete_modal.html" %}
+{% endblock %}

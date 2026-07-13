@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Setup required · {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="auth-card mx-auto" style="max-width: 560px;">
+  <p class="auth-eyebrow">Configuration</p>
+  <h1 class="page-title" style="font-size: 1.8rem;">Database not connected</h1>
+
+  {% if connection_failed %}
+  <p class="page-sub">
+    Packs could not connect with the current <code>SUPABASE_DB_URL</code>.
+    Check the password, host, and that your IP is allowed in Supabase.
+  </p>
+  {% else %}
+  <p class="page-sub">
+    Your <code>.env</code> file is missing <code>SUPABASE_DB_URL</code>.
+    The app cannot load packs until that is set.
+  </p>
+  {% endif %}
+
+  <ol class="mt-3 mb-4">
+    <li>Open your Supabase project → <strong>Project Settings → Database</strong></li>
+    <li>Copy the <strong>URI</strong> connection string (Transaction or Session pooler is fine)</li>
+    <li>Paste it into <code>.env</code> as <code>SUPABASE_DB_URL=...</code></li>
+    <li>Restart the Flask server</li>
+  </ol>
+
+  <pre class="p-3 rounded" style="background: var(--sand-deep); font-size: 0.85rem; overflow-x: auto;">SUPABASE_DB_URL=postgresql://postgres.[ref]:[YOUR-PASSWORD]@aws-0-[region].pooler.supabase.com:6543/postgres</pre>
+
+  {% if error_detail %}
+  <p class="form-text text-danger mt-3 mb-0"><code>{{ error_detail }}</code></p>
+  {% endif %}
+</div>
+{% endblock %}

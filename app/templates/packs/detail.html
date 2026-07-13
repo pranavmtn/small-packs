@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}{{ pack.name }} · {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+  <div>
+    <a href="{{ url_for('packs.list_packs') }}" class="back-link">&larr; All packs</a>
+    <h1 class="page-title mt-2">{{ pack.name }}</h1>
+    <p class="page-sub mb-0">{{ pack.location_display() or "No location" }}</p>
+  </div>
+  <div class="d-flex flex-wrap gap-2">
+    <a href="{{ url_for('packs.edit', pack_id=pack.id) }}" class="btn btn-ink">Edit</a>
+    <button
+      type="button"
+      class="btn btn-outline-danger"
+      data-bs-toggle="modal"
+      data-bs-target="#deleteModal"
+      data-delete-url="{{ url_for('packs.delete', pack_id=pack.id) }}"
+      data-delete-name="{{ pack.name }}"
+    >Delete</button>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-12 col-lg-6">
+    <div class="detail-photo">
+      {% if pack.photo_url %}
+        <img src="{{ pack.photo_url }}" alt="{{ pack.name }}">
+      {% else %}
+        <div class="detail-photo-empty">No photo</div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="col-12 col-lg-6">
+    <dl class="detail-grid">
+      <div>
+        <dt>Status</dt>
+        <dd><span class="status-pill status-{{ pack.status }}">{{ pack.status|capitalize }}</span></dd>
+      </div>
+      <div>
+        <dt>Age</dt>
+        <dd>{{ pack.age_display() }}</dd>
+      </div>
+      <div>
+        <dt>Location</dt>
+        <dd>
+          {% if pack.location %}
+            <ol class="location-path">
+              {% for part in pack.location %}
+                <li>{{ part }}</li>
+              {% endfor %}
+            </ol>
+          {% else %}
+            —
+          {% endif %}
+        </dd>
+      </div>
+      <div>
+        <dt>Category</dt>
+        <dd>{{ pack.category or "—" }} <span class="text-muted small">(AI later)</span></dd>
+      </div>
+      <div>
+        <dt>Condition</dt>
+        <dd>{% if pack.condition_percent is not none %}{{ pack.condition_percent }}%{% else %}—{% endif %}</dd>
+      </div>
+      <div>
+        <dt>Importance</dt>
+        <dd>{% if pack.importance_percent is not none %}{{ pack.importance_percent }}%{% else %}—{% endif %}</dd>
+      </div>
+      <div>
+        <dt>Suggested Price</dt>
+        <dd>{% if pack.suggested_price is not none %}{{ pack.suggested_price }}{% else %}—{% endif %}</dd>
+      </div>
+      <div class="full">
+        <dt>Notes</dt>
+        <dd class="notes-block">{{ pack.notes or "—" }}</dd>
+      </div>
+      <div class="full">
+        <dt>AI Description</dt>
+        <dd class="text-muted">{{ pack.ai_description or "Not generated yet — reserved for future AI." }}</dd>
+      </div>
+      <div>
+        <dt>Created</dt>
+        <dd>{{ pack.created_at.strftime('%Y-%m-%d %H:%M') if pack.created_at else "—" }}</dd>
+      </div>
+      <div>
+        <dt>Updated</dt>
+        <dd>{{ pack.updated_at.strftime('%Y-%m-%d %H:%M') if pack.updated_at else "—" }}</dd>
+      </div>
+    </dl>
+  </div>
+</div>
+
+{% include "packs/_delete_modal.html" %}
+{% endblock %}
