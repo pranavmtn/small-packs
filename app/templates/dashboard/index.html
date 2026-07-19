@@ -7,7 +7,7 @@
     <h1 class="page-title">Dashboard</h1>
     <p class="page-sub mb-0">Your household packs at a glance.</p>
   </div>
-  <a href="{{ url_for('packs.add') }}" class="btn btn-accent btn-lg">+ Add Pack</a>
+  <a href="{{ url_for('packs.add') }}" class="btn btn-accent btn-lg d-none d-md-inline-block">+ Add Pack</a>
 </div>
 
 <div class="row g-3 mb-4">
@@ -70,7 +70,7 @@
   {% else %}
     <div class="empty-state">
       <p>No packs yet.</p>
-      <a href="{{ url_for('packs.add') }}" class="btn btn-accent">Add your first pack</a>
+      <p>Use the button below to add your first pack.</p>
     </div>
   {% endif %}
 </section>
