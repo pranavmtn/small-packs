@@ -1,9 +1,23 @@
 """Packs Flask application factory."""
 
+import logging
+import os
 from flask import Flask
 
 from config import config_by_name
 from app.services.database import db
+
+
+# Configure logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('app.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
 
 
 def create_app(config_name: str = "default") -> Flask:
@@ -16,8 +30,15 @@ def create_app(config_name: str = "default") -> Flask:
 
     config_cls = config_by_name.get(config_name, config_by_name["default"])
     app.config.from_object(config_cls)
+    
+    # Log database configuration
+    logger.info(f"Config: {config_name}")
+    logger.info(f"Database configured: {app.config.get('DATABASE_CONFIGURED')}")
+    logger.info(f"Database URI: {app.config.get('SQLALCHEMY_DATABASE_URI', '').split('@')[0]}...")
+    logger.info(f"SUPABASE_DB_URL env: {os.getenv('SUPABASE_DB_URL', 'NOT SET')[:50]}...")
 
     db.init_app(app)
+    logger.info("Database initialized")
 
     _register_blueprints(app)
     _register_context_processors(app)
