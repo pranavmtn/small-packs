@@ -9,9 +9,10 @@ from urllib.parse import quote_plus
 
 from dotenv import load_dotenv
 
-# Always load project .env (override empty values left by a previous process)
+# Only load .env in development mode (not in production/Railway)
 _ENV_PATH = Path(__file__).resolve().parent / ".env"
-load_dotenv(_ENV_PATH, override=True)
+if os.getenv("FLASK_ENV", "development") == "development":
+    load_dotenv(_ENV_PATH, override=True)
 
 
 def _normalize_db_url(raw: str) -> str:
